@@ -1,34 +1,12 @@
 @use '@angular/material' as mat;
-
-@include mat.core();
-
-$dark-theme: mat.define-theme(
-  (
-    color: (
-      theme-type: dark,
-      primary: mat.$green-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: (
-      brand-family: 'Inter, sans-serif',
-      plain-family: 'Inter, sans-serif',
-    ),
-  )
-);
-
-$light-theme: mat.define-theme(
-  (
-    color: (
-      theme-type: light,
-      primary: mat.$green-palette,
-    ),
-    typography: (
-      brand-family: 'Inter, sans-serif',
-      plain-family: 'Inter, sans-serif',
-    ),
-  )
-);
+@use './theme' as *;
 
 html {
   @include mat.all-component-themes($light-theme);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--mat-app-background-color);
+  color: var(--mat-app-text-color);
 }
