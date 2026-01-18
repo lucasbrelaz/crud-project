@@ -1,0 +1,27 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Lucas Brelaz",
+      "email": "contato@lucasbrelaz.com",
+      "role": "Admin",
+      "status": "Ativo",
+      "createdAt": "2026-01-16T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "name": "Ana Silva",
+      "email": "ana.silva@exemplo.com",
+      "role": "Editor",
+      "status": "Inativo",
+      "createdAt": "2026-01-15T14:30:00Z"
+    },
+    {
+      "id": "c870",
+      "name": "Fulano",
+      "email": "fulanon@exemplo.com",
+      "role": "Developer",
+      "status": "Ativo"
+    }
+  ]
+}
