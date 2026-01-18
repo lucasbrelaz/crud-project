@@ -1,0 +1,47 @@
+<h1 mat-dialog-title>{{ data ? 'Editar' : 'Novo' }} usuário</h1>
+
+<mat-dialog-content>
+  <form [formGroup]="userForm" class="form-wrapper">
+    <mat-form-field appearance="outline">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="name" placeholder="Ex: Lucas" min="3" max="255" />
+      @if (userForm.get('name')?.hasError('required')) {
+        <mat-error>Nome é obrigatório</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>E-mail</mat-label>
+      <input matInput formControlName="email" placeholder="email@exemplo.com" min="10" max="255" />
+      @if (userForm.get('name')?.hasError('required')) {
+        <mat-error>E-mail é obrigatório</mat-error>
+      }
+      @if (userForm.get('email')?.hasError('email')) {
+        <mat-error>E-mail inválido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Cargo</mat-label>
+      <input matInput formControlName="role" placeholder="Ex: Desenvolvedor" min="3" max="255" />
+      @if (userForm.get('role')?.hasError('required')) {
+        <mat-error>Cargo é obrigatório</mat-error>
+      }
+    </mat-form-field>
+
+    @if (data?.id) {
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status" placeholder="Status">
+          <mat-option value="Ativo">Ativo</mat-option>
+          <mat-option value="Inativo">Inativo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="closeDialog()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="confirmDialog()">Salvar</button>
+</mat-dialog-actions>
