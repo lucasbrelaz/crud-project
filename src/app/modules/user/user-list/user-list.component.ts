@@ -5,10 +5,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
-import { catchError, debounceTime, of, switchMap, tap } from 'rxjs';
+import { DarkModeService } from '@shared/service/dark-mode.service';
+import { catchError, debounceTime, map, of, switchMap, tap } from 'rxjs';
 import { UserCreateEditDialogComponent } from '../user-create-edit-dialog/user-create-edit-dialog.component';
 import { IUser } from '../user.model';
 import { UserService } from '../user.service';
@@ -23,6 +25,7 @@ import { UserService } from '../user.service';
     MatTableModule,
     MatInputModule,
     MatFormFieldModule,
+    MatPaginatorModule,
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss',
@@ -31,6 +34,11 @@ export class UserListComponent {
   private readonly userService = inject(UserService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly darkModeService = inject(DarkModeService);
+
+  pageSize = signal(5);
+  pageIndex = signal(0);
+  totalUsers = signal(0);
 
   searchQuery = signal<string>('');
   isLoading = signal<boolean>(false);
@@ -47,12 +55,19 @@ export class UserListComponent {
   displayedColumns: string[] = ['name', 'email', 'role', 'status', 'actions'];
 
   private readonly usersStream$ = toObservable(
-    computed(() => ({ query: this.searchQuery(), refresh: this.refreshTrigger() })),
+    computed(() => ({
+      query: this.searchQuery(),
+      refresh: this.refreshTrigger(),
+      page: this.pageIndex() + 1,
+      limit: this.pageSize(),
+    })),
   ).pipe(
     debounceTime(400),
     tap(() => this.isLoading.set(true)),
-    switchMap(({ query }) =>
-      this.userService.getUsers(query).pipe(
+    switchMap(({ query, page, limit }) =>
+      this.userService.getUsers(query, page, limit).pipe(
+        tap((res) => this.totalUsers.set(res.total)),
+        map((res) => res.data),
         catchError(() => {
           this.snackBar.open('Erro ao carregar', 'Fechar');
           return of([]);
@@ -66,6 +81,11 @@ export class UserListComponent {
 
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageSize.set(event.pageSize);
+    this.pageIndex.set(event.pageIndex);
   }
 
   clearSearch(): void {

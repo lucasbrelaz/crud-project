@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, delay, retry } from 'rxjs/operators';
+import { catchError, delay, map, retry } from 'rxjs/operators';
 import { IUser } from './user.model';
 
 @Injectable({
@@ -12,9 +12,19 @@ export class UserService {
 
   http = inject(HttpClient);
 
-  getUsers(query?: string): Observable<IUser[]> {
-    const url = query ? `${this.API_URL}?q=${query}` : this.API_URL;
-    return this.http.get<IUser[]>(url).pipe(delay(800), retry(1), catchError(this.handleError));
+  getUsers(query?: string, page = 1, limit = 5): Observable<{ data: IUser[]; total: number }> {
+    let url = `${this.API_URL}?_page=${page}&_limit=${limit}`;
+    if (query) url += `&q=${query}`;
+
+    return this.http.get<IUser[]>(url, { observe: 'response' }).pipe(
+      delay(800),
+      map((response) => ({
+        data: response.body || [],
+        total: Number(response.headers.get('X-Total-Count')) || 0,
+      })),
+      retry(1),
+      catchError(this.handleError),
+    );
   }
 
   createUser(user: Omit<IUser, 'id'>): Observable<IUser> {
