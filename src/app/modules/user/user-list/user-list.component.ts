@@ -79,6 +79,14 @@ export class UserListComponent {
 
   users = toSignal(this.usersStream$, { initialValue: [] });
 
+  isDarkMode = computed(() => this.darkModeService.currentTheme() === 'theme-dark');
+
+  toggleDarkMode() {
+    this.darkModeService.setTheme(
+      this.darkModeService.currentTheme() === 'theme-dark' ? 'theme-light' : 'theme-dark',
+    );
+  }
+
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
   }

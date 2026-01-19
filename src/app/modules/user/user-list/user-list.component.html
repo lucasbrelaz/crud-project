@@ -1,6 +1,22 @@
 <div class="container">
   <header class="page-header">
-    <h2>Gerenciamento de usuários</h2>
+    <div class="page-header-top">
+      <h2>Gerenciamento de usuários</h2>
+      <button
+        mat-icon-button
+        (click)="toggleDarkMode()"
+        aria-label="Alternar modo claro/escuro"
+        [title]="isDarkMode() ? 'Modo claro' : 'Modo escuro'"
+      >
+        <mat-icon>
+          @if (isDarkMode()) {
+            light_mode
+          } @else {
+            dark_mode
+          }
+        </mat-icon>
+      </button>
+    </div>
 
     <div class="page-actions">
       <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">

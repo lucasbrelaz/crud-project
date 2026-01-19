@@ -1,7 +1,8 @@
 @use '@angular/material' as mat;
 @use './theme' as *;
+@use './table' as *;
 
-html {
+html .theme-light {
   @include mat.all-component-themes($light-theme);
 }
 
@@ -9,4 +10,10 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--mat-app-background-color);
   color: var(--mat-app-text-color);
+  margin: 0;
+  padding: 0 32px;
+
+  &.theme-dark {
+    @include mat.all-component-colors($dark-theme);
+  }
 }

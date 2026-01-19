@@ -1,0 +1,20 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+html {
+  --mat-table-row-item-outline-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.mat-mdc-header-row {
+  background-color: map.get(mat.$green-palette, 30) !important;
+  color: map.get(mat.$green-palette, 100) !important;
+  border-radius: 12px 12px 0 0;
+}
+
+th.mat-mdc-header-cell:first-of-type {
+  border-top-left-radius: 12px;
+}
+
+th.mat-mdc-header-cell:last-of-type {
+  border-top-right-radius: 12px;
+}
