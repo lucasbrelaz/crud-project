@@ -9,6 +9,10 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
+import {
+  ConfirmDialogComponent,
+  IConfirmDialogData,
+} from '@shared/confirm-dialog/confirm-dialog.component';
 import { DarkModeService } from '@shared/service/dark-mode.service';
 import { catchError, debounceTime, map, of, switchMap, tap } from 'rxjs';
 import { UserCreateEditDialogComponent } from '../user-create-edit-dialog/user-create-edit-dialog.component';
@@ -104,16 +108,29 @@ export class UserListComponent {
     this.refreshTrigger.update((currentValue) => currentValue + 1);
   }
 
-  deleteUser(user: IUser): void {
-    if (confirm(`Tem certeza que deseja excluir o usuário ${user.name}?`)) {
-      this.userService.deleteUser(user.id).subscribe({
-        next: () => {
-          this.snackBar.open('Usuário excluído com sucesso', 'OK', { duration: 3000 });
-          this.refreshList();
-        },
-        error: () => this.snackBar.open('Erro ao excluir usuário', 'Fechar'),
-      });
-    }
+  openDeleteUserDialog(user: IUser): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Confirmar exclusão',
+        message: `Tem certeza que deseja excluir o usuário ${user.name}?`,
+        type: 'warn',
+      } as IConfirmDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) this.deleteUser(user);
+    });
+  }
+
+  private deleteUser(user: IUser) {
+    this.userService.deleteUser(user.id).subscribe({
+      next: () => {
+        this.snackBar.open('Usuário excluído com sucesso', 'OK', { duration: 3000 });
+        this.refreshList();
+      },
+      error: () => this.snackBar.open('Erro ao excluir usuário', 'Fechar'),
+    });
   }
 
   openUserCreateEditDialog(user?: IUser): void {
