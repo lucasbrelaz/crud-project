@@ -31,6 +31,12 @@ export class UserCreateEditDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<UserCreateEditDialogComponent>);
   readonly data = inject<IUser | null>(MAT_DIALOG_DATA);
 
+  protected readonly EUserStatus = EUserStatus;
+  protected readonly statusOptions = [
+    { value: EUserStatus.ACTIVE, label: 'Ativo' },
+    { value: EUserStatus.INACTIVE, label: 'Inativo' },
+  ];
+
   userForm: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],

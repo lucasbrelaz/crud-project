@@ -33,8 +33,11 @@
       <mat-form-field appearance="outline">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status" placeholder="Status">
-          <mat-option value="Ativo">Ativo</mat-option>
-          <mat-option value="Inativo">Inativo</mat-option>
+          @for (option of statusOptions; track option.value) {
+            <mat-option [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
     }
