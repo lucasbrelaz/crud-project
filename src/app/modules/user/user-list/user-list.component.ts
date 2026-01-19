@@ -93,6 +93,7 @@ export class UserListComponent {
 
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
+    this.pageIndex.set(0);
   }
 
   onPageChange(event: PageEvent) {
@@ -102,6 +103,7 @@ export class UserListComponent {
 
   clearSearch(): void {
     this.searchQuery.set('');
+    this.pageIndex.set(0);
   }
 
   refreshList(): void {
