@@ -45,7 +45,13 @@ export class UserCreateEditDialogComponent implements OnInit {
   }
 
   confirmDialog(): void {
-    if (this.userForm.valid && this.data?.id) {
+    this.userForm.markAllAsTouched();
+
+    if (this.userForm.invalid) {
+      return;
+    }
+
+    if (this.data?.id) {
       this.updateUser();
     } else {
       this.createUser();
@@ -88,7 +94,7 @@ export class UserCreateEditDialogComponent implements OnInit {
   }
 
   private handleError(type: string) {
-    this.snackBar.open(`Erro ao ${{ type }}.`, 'Fechar', { duration: SNACKBAR_DURATION });
+    this.snackBar.open(`Erro ao ${type}.`, 'Fechar', { duration: SNACKBAR_DURATION });
   }
 
   closeDialog(): void {
