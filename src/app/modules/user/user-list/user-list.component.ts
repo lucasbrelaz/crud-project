@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +19,7 @@ import { EmptyStateComponent } from '@shared/empty-state/empty-state.component';
 import { DarkModeService } from '@shared/service/dark-mode.service';
 import { catchError, debounceTime, map, of, switchMap, tap } from 'rxjs';
 import { UserCreateEditDialogComponent } from '../user-create-edit-dialog/user-create-edit-dialog.component';
-import { IUser } from '../user.model';
+import { EUserStatus, IUser } from '../user.model';
 import { UserService } from '../user.service';
 
 @Component({
@@ -33,6 +34,7 @@ import { UserService } from '../user.service';
     MatFormFieldModule,
     MatPaginatorModule,
     EmptyStateComponent,
+    MatChipsModule,
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss',
@@ -42,6 +44,8 @@ export class UserListComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly darkModeService = inject(DarkModeService);
+
+  protected readonly EUserStatus = EUserStatus;
 
   pageSize = signal(5);
   pageIndex = signal(0);
@@ -74,17 +78,17 @@ export class UserListComponent {
     switchMap(({ query, page, limit }) =>
       this.userService.getUsers(query, page, limit).pipe(
         tap((res) => this.totalUsers.set(res.total)),
-        map((res) => res.data),
+        map((res) => res.data as IUser[]),
         catchError(() => {
           this.snackBar.open('Erro ao carregar', 'Fechar');
-          return of([]);
+          return of([] as IUser[]);
         }),
       ),
     ),
     tap(() => this.isLoading.set(false)),
   );
 
-  users = toSignal(this.usersStream$, { initialValue: [] });
+  users = toSignal(this.usersStream$, { initialValue: [] as IUser[] });
 
   isDarkMode = computed(() => this.darkModeService.currentTheme() === 'theme-dark');
 

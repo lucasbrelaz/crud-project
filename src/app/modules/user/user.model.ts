@@ -8,6 +8,6 @@ export interface IUser {
 }
 
 export enum EUserStatus {
-  ACTIVE = 'Ativo',
-  INACTIVE = 'Inativo',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
 }

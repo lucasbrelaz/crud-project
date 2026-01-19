@@ -33,3 +33,12 @@
   align-items: center;
   height: 200px;
 }
+
+.mat-mdc-chip-set {
+  --mdc-chip-container-shape-radius: 100px;
+
+  .chip-active {
+    --mdc-chip-label-text-color: #1b5e20;
+    background-color: #c8e6c9 !important;
+  }
+}
