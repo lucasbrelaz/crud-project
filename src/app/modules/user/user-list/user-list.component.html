@@ -95,14 +95,15 @@
     </mat-paginator>
   }
 
-  @if (isSearchEmpty()) {
-    <p>
-      Nenhum usuário encontrado para o termo <strong>{{ searchQuery() }}</strong
-      >.
-    </p>
+  @if (isDatabaseEmpty()) {
+    <app-empty-state subtitle="Comece adicionando um novo usuário." />
   }
 
-  @if (isDatabaseEmpty()) {
-    <p>Nenhum usuário encontrado.</p>
+  @if (isSearchEmpty()) {
+    <app-empty-state
+      icon="search_off"
+      title="Nenhum usuário encontrado"
+      subtitle="Tente ajustar os termos da sua busca."
+    />
   }
 </div>

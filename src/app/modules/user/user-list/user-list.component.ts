@@ -13,6 +13,8 @@ import {
   ConfirmDialogComponent,
   IConfirmDialogData,
 } from '@shared/confirm-dialog/confirm-dialog.component';
+import { SNACKBAR_DURATION } from '@shared/constant/duration.constant';
+import { EmptyStateComponent } from '@shared/empty-state/empty-state.component';
 import { DarkModeService } from '@shared/service/dark-mode.service';
 import { catchError, debounceTime, map, of, switchMap, tap } from 'rxjs';
 import { UserCreateEditDialogComponent } from '../user-create-edit-dialog/user-create-edit-dialog.component';
@@ -30,6 +32,7 @@ import { UserService } from '../user.service';
     MatInputModule,
     MatFormFieldModule,
     MatPaginatorModule,
+    EmptyStateComponent,
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss',
@@ -49,7 +52,7 @@ export class UserListComponent {
   private readonly refreshTrigger = signal<number>(0);
 
   isSearchEmpty = computed(
-    () => !this.isLoading() && this.users().length === 0 && this.searchQuery(),
+    () => !this.isLoading() && this.users().length === 0 && !!this.searchQuery(),
   );
   isDatabaseEmpty = computed(
     () => !this.isLoading() && this.users().length === 0 && !this.searchQuery(),
@@ -128,7 +131,7 @@ export class UserListComponent {
   private deleteUser(user: IUser) {
     this.userService.deleteUser(user.id).subscribe({
       next: () => {
-        this.snackBar.open('Usuário excluído com sucesso', 'OK', { duration: 3000 });
+        this.snackBar.open('Usuário excluído com sucesso', 'OK', { duration: SNACKBAR_DURATION });
         this.refreshList();
       },
       error: () => this.snackBar.open('Erro ao excluir usuário', 'Fechar'),

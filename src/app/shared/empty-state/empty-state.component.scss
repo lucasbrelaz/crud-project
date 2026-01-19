@@ -1,0 +1,23 @@
+$icon-size: 32px;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+  background-color: var(--mat-select-panel-background-color);
+
+  .title,
+  .subtitle {
+    margin: 0;
+  }
+
+  .mat-icon {
+    font-size: $icon-size;
+    width: $icon-size;
+    height: $icon-size;
+  }
+}
