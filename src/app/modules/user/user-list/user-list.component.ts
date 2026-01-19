@@ -1,14 +1,16 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
-import { SNACKBAR_DURATION } from '@shared/constant/duration.constant';
+import { catchError, debounceTime, of, switchMap, tap } from 'rxjs';
 import { UserCreateEditDialogComponent } from '../user-create-edit-dialog/user-create-edit-dialog.component';
-import { EUserStatus, IUser } from '../user.model';
+import { IUser } from '../user.model';
 import { UserService } from '../user.service';
 
 @Component({
@@ -16,56 +18,72 @@ import { UserService } from '../user.service';
   standalone: true,
   imports: [
     MatProgressSpinnerModule,
-    MatTableModule,
-    MatSnackBarModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule,
+    MatTableModule,
+    MatInputModule,
+    MatFormFieldModule,
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss',
 })
-export class UserListComponent implements OnInit {
-  private userService = inject(UserService);
-  private snackBar = inject(MatSnackBar);
+export class UserListComponent {
+  private readonly userService = inject(UserService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
-  users = signal<IUser[]>([]);
+  searchQuery = signal<string>('');
   isLoading = signal<boolean>(false);
+  private readonly refreshTrigger = signal<number>(0);
+
+  isSearchEmpty = computed(
+    () => !this.isLoading() && this.users().length === 0 && this.searchQuery(),
+  );
+  isDatabaseEmpty = computed(
+    () => !this.isLoading() && this.users().length === 0 && !this.searchQuery(),
+  );
+  showTable = computed(() => !this.isLoading() && this.users().length > 0);
+
   displayedColumns: string[] = ['name', 'email', 'role', 'status', 'actions'];
 
-  UserStatus = EUserStatus;
+  private readonly usersStream$ = toObservable(
+    computed(() => ({ query: this.searchQuery(), refresh: this.refreshTrigger() })),
+  ).pipe(
+    debounceTime(400),
+    tap(() => this.isLoading.set(true)),
+    switchMap(({ query }) =>
+      this.userService.getUsers(query).pipe(
+        catchError(() => {
+          this.snackBar.open('Erro ao carregar', 'Fechar');
+          return of([]);
+        }),
+      ),
+    ),
+    tap(() => this.isLoading.set(false)),
+  );
 
-  private dialog = inject(MatDialog);
+  users = toSignal(this.usersStream$, { initialValue: [] });
 
-  ngOnInit(): void {
-    this.loadUsers();
+  onSearchChange(value: string): void {
+    this.searchQuery.set(value);
   }
 
-  loadUsers(): void {
-    this.isLoading.set(true);
-    this.userService.getUsers().subscribe({
-      next: (data) => {
-        this.users.set(data);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.snackBar.open('Erro ao carregar usuários', 'Fechar');
-        this.isLoading.set(false);
-      },
-    });
+  clearSearch(): void {
+    this.searchQuery.set('');
+  }
+
+  refreshList(): void {
+    this.refreshTrigger.update((currentValue) => currentValue + 1);
   }
 
   deleteUser(user: IUser): void {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+    if (confirm(`Tem certeza que deseja excluir o usuário ${user.name}?`)) {
       this.userService.deleteUser(user.id).subscribe({
         next: () => {
-          this.users.update((userList) =>
-            userList.filter((userToDelete) => userToDelete.id !== user.id),
-          );
-          this.snackBar.open('Usuário excluído com sucesso', 'OK', {
-            duration: SNACKBAR_DURATION,
-          });
+          this.snackBar.open('Usuário excluído com sucesso', 'OK', { duration: 3000 });
+          this.refreshList();
         },
+        error: () => this.snackBar.open('Erro ao excluir usuário', 'Fechar'),
       });
     }
   }
@@ -77,7 +95,7 @@ export class UserListComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) this.loadUsers();
+      if (result) this.refreshList();
     });
   }
 }

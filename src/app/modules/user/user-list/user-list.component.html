@@ -1,9 +1,27 @@
 <div class="container">
   <header class="page-header">
     <h2>Gerenciamento de usuários</h2>
-    <button mat-flat-button color="primary" (click)="openUserCreateEditDialog()">
-      <mat-icon>add</mat-icon> Novo usuário
-    </button>
+
+    <div class="page-actions">
+      <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+        <input
+          matInput
+          [value]="searchQuery()"
+          (input)="onSearchChange($any($event.target).value)"
+          placeholder="Pesquisar usuários..."
+        />
+
+        @if (searchQuery()) {
+          <button mat-icon-button matSuffix (click)="clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" (click)="openUserCreateEditDialog()">
+        <mat-icon>add</mat-icon> Novo usuário
+      </button>
+    </div>
   </header>
 
   @if (isLoading()) {
@@ -12,7 +30,7 @@
     </div>
   }
 
-  @if (!isLoading() && users().length > 0) {
+  @if (showTable()) {
     <table mat-table [dataSource]="users()" class="mat-elevation-z4">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef="let user">Nome</th>
@@ -51,7 +69,14 @@
     </table>
   }
 
-  @if (!isLoading() && users().length === 0) {
+  @if (isSearchEmpty()) {
+    <p>
+      Nenhum usuário encontrado para o termo <strong>{{ searchQuery() }}</strong
+      >.
+    </p>
+  }
+
+  @if (isDatabaseEmpty()) {
     <p>Nenhum usuário encontrado.</p>
   }
 </div>

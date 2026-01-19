@@ -12,10 +12,9 @@ export class UserService {
 
   http = inject(HttpClient);
 
-  getUsers(): Observable<IUser[]> {
-    return this.http
-      .get<IUser[]>(this.API_URL)
-      .pipe(delay(800), retry(2), catchError(this.handleError));
+  getUsers(query?: string): Observable<IUser[]> {
+    const url = query ? `${this.API_URL}?q=${query}` : this.API_URL;
+    return this.http.get<IUser[]>(url).pipe(delay(800), retry(1), catchError(this.handleError));
   }
 
   createUser(user: Omit<IUser, 'id'>): Observable<IUser> {
