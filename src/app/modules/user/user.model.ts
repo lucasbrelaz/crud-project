@@ -4,7 +4,6 @@ export interface IUser {
   email: string;
   role: string;
   status: EUserStatus;
-  createdAt: string;
 }
 
 export enum EUserStatus {

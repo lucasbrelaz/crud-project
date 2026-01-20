@@ -15,7 +15,6 @@ describe('UserService', () => {
     email: 'lucas@test.com',
     role: 'Developer',
     status: EUserStatus.ACTIVE,
-    createdAt: new Date().toISOString(),
   };
 
   beforeEach(() => {
